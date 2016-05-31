@@ -1,0 +1,566 @@
+<!doctype html>
+<html>
+    <meta charset="utf-8"/>
+    <head>
+        <title>Summer Vacation</title>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
+        <script   src="https://code.jquery.com/ui/1.11.3/jquery-ui.min.js"   integrity="sha256-xI/qyl9vpwWFOXz7+x/9WkG5j/SVnSw21viy8fWwbeE="   crossorigin="anonymous"></script>
+        <link href='https://fonts.googleapis.com/css?family=Bangers' rel='stylesheet' type='text/css'>
+        <link href='https://fonts.googleapis.com/css?family=Sigmar+One' rel='stylesheet' type='text/css'>
+        <script>
+
+            var viewDetail = function(route){
+                window.location.href = route;
+
+            }
+
+            var selectButton = function(divID, month){
+                $("#may_date").removeClass('selected');
+                $("#june_date").removeClass('selected');
+                $("#july_date").removeClass('selected');
+                $("#august_date").removeClass('selected');
+
+                $(divID).addClass('selected');
+                window.location.href = "/SummerVacation/lexi/" + month + "/1";
+
+            }
+
+            var book_count = {
+
+                {% for i in book_counts %}
+
+                    '{{i.1}}':'{{i.2}}',
+
+                {% endfor %}
+
+            }
+
+            var book_comments = {
+                {% for  i in todays_books %}
+
+                    '{{i.0}}':'{{ i.2|striptags}}',
+
+
+                {% endfor %}
+
+
+            }
+
+            var total = {{total_books_read.0}};
+
+            var length_total = total/100 * 200;
+
+            var percent_complete = Math.round(total/100 * 100,0);
+
+            var chooseFromLibrary = function(){
+                $('.library_div').addClass('visible');
+                $(".library_div").animate({bottom: '-50px'},'slow');
+            }
+
+            var closeLibraryChooser = function(){
+
+                $(".library_div").animate({bottom: '-600px'},'slow',function(){$('.library_div').removeClass('visible');});
+
+            }
+
+            var chooseItem = function(book_title){
+                closeLibraryChooser();
+                $("#input_book_textarea").val(book_title);
+            }
+
+            $(document).ready(function(){
+                $('.book_count_display').each(function(){
+                    $(this).html(book_count[$(this).attr('id')]);
+                });
+
+                $("#day_{{month}}_{{day}}").addClass('date_selected');
+
+                    var availableTags = [
+                        {% for i in library_books %}
+
+                            '{{i.0|striptags}}',
+
+                        {% endfor %}
+
+                        ];
+                    //$( "#input_book_textarea" ).autocomplete({source: availableTags});
+
+
+
+                $('.book_title_area').click(function(){
+
+                    $('#title_textarea').html($(this).html());
+                    $('#book_comment_area').html(book_comments[$(this).attr('id')]);
+                });
+
+                $(".progress_bar_status").animate({width: length_total.toString() + 'px'},'slow');
+                $('#progress_bar_status_div').html(percent_complete.toString() + '%');
+
+            });
+
+        </script>
+        <style>
+            body{
+                background-color: #8c1aff;
+                margin: 0 auto;
+                padding: 0;
+
+            }
+            .big_wrapper{
+                margin: 0 auto;
+                //border: 1px solid #303030;
+                width: 1350px;
+                height: 2500px;
+                //background-color: white;
+            }
+
+            .calendar{
+                width: 740px;
+                display: inline-block;
+                border: 1px solid #303030;
+                float: left;
+                margin-left: 0px;
+                margin-right: 10px;
+                padding: 10px;
+                padding-right: 1px;
+                border-radius: 10px;
+                box-shadow: -1px 1px 5px #2e004d;
+                background-color: white;
+                height: 712px;
+            }
+
+            .calendar_date{
+                height:100px;
+                width:100px;
+                float:left;
+                display: inline-block;
+                border: 1px solid #303030;
+                margin: 0 auto;
+                background: #cccccc;
+            }
+            .calendar_date:hover{
+                background-color: #b3b3cc;
+                color:#4d004d;
+            }
+            .calendar_blank{
+                height:102px;
+                width:102px;
+                float:left;
+                display: inline-block;
+                margin: 0 auto;
+            }
+            .day_of_week{
+                padding: 5px;
+                border: 1px solid white;
+                width: 90px;
+                background-color: #303030;
+                display: inline-block;
+                float:left;
+                text-align: center;
+                color: white;
+            }
+            .day_labels{
+                margin-bottom: 10px;
+                padding-bottom: 10px;
+                height: 25px;
+                float: left;
+            }
+            .summer_title{
+                margin: 0 auto;
+                padding: 5px 5px 5px 15px;
+                font-family: 'Bangers', cursive;
+                font-size: 24px;
+                float:right;
+                margin-right: 30px;
+
+            }
+            .day_tracker{
+                display: inline-block;
+                border: 1px solid #303030;
+                width: 280px;
+                float: left;
+                height: 734px;
+                margin: 0 auto;
+                border-radius: 10px;
+                box-shadow: -1px 1px 5px #2e004d;
+                background-color: white;
+                margin-right: 10px;
+            }
+
+            .day_header{
+                margin: 0 auto;
+                //background-color:#4d004d;
+                text-align: center;
+                padding: 20px;
+                border-radius: 10px 10px 0 0;
+                font-family: 'Bangers', cursive;
+                font-size: 32px;
+
+            }
+            .input_book{
+                width: 245px;
+                margin: 10px;
+                padding: 5px;
+                font-size: 18px;
+                height: 25px;
+                margin-bottom: 5px;
+            }
+            .send_book_button{
+                width: 260px;
+                margin: 10px;
+                margin-top: 2px;
+                padding: 5px;
+                font-size: 20px;
+                height: 50px;
+                border-radius: 5px;
+
+            }
+            .send_book_button:hover{
+                 background-color: #303030;
+                 color: white;
+            }
+            .book_area{
+                width: 260px;
+                margin: 10px;
+                margin-top: 2px;
+                padding: 5px;
+                font-size: 20px;
+                height: 150px;
+
+            }
+            .books_area{
+                display: block;
+                width: 250px;
+                padding: 5px;
+                margin: 5px;
+                border-bottom: 1px solid #cccccc;
+                height: 60%;
+
+            }
+
+            .input_book_text{
+                width: 245px;
+                margin: 10px;
+                margin-top: 2px;
+                margin-bottom: 2px;
+                padding: 5px;
+                font-size: 18px;
+                height: 100px;
+
+
+            }
+
+            .book_count_display{
+                margin: 0 auto;
+                text-align: center;
+                font-family: 'Bangers', cursive;
+                font-size: 48px;
+                margin-top: 10px;
+            }
+            .book_count_display:hover{
+                color:#4d004d ;
+            }
+            .month_button{
+                width: 50px;
+                height: 15px;
+                display: inline-block;
+                float: left;
+                background-color: #303030;
+                margin: 2px;
+                margin-bottom: 5px;
+                border-radius: 15px;
+                text-align: center;
+                color: white;
+                font-size: 14px;
+                padding: 5px;
+
+            }
+            .month_button:hover{
+                opacity: 0.7;
+            }
+            .selected{
+                background-color: red;
+            }
+            .total_books{
+                margin: 0 auto;
+                font-family: 'Bangers', cursive;
+                font-size: 18px;
+                margin-top: 10px;
+            }
+            .delete_book{
+
+                font-size:14px;
+                float: right;
+                margin-right: 20px;
+                padding: 2px;
+            }
+            .delete_book_button{
+                display: inline-block;
+                float: right;
+
+            }
+            .book_title_area{
+                display: inline-block;
+                float:left;
+            }
+            .date_selected{
+                background-color: #303030;
+                color: white;
+            }
+
+            .book_comment_textarea{
+                width: 250px;
+                height: 300px;
+                //border: 1px solid #303030;
+                margin: 15px;
+                word-wrap: break-word;
+                padding: 5px;
+                margin-top: 5px;
+            }
+            .book_title_textarea{
+                width: 250px;
+                height: 25px;
+                //border: 1px solid #303030;
+                margin: 15px;
+                word-wrap: break-word;
+                padding: 5px;
+                margin-top: 5px;
+            }
+            .progess_bar{
+                width: 200px;
+                margin: 5px;
+                padding: 0x;
+                background-color: #303030;
+                border-radius: 15px;
+                height: 37px;
+                color: white;
+                font-family: 'Bangers', cursive;
+                text-align: center;
+                margin-top: 40px;
+            }
+            .progress_bar_status{
+                width: 0px;
+                margin: 0px;
+                padding: 10px;
+                background-color: #00ff00;
+                border-radius: 15px;
+                height: 15px;
+                color: white;
+                font-family: 'Bangers', cursive;
+                text-align: center;
+                border: 1px solid #00ff00;
+                display: inline;
+                position: relative;
+                float: left;
+
+
+            }
+            .center{
+                text-align: center;
+            }
+
+            .choose_from_library{
+                margin: 0 auto;
+                margin-left: 10px;
+            }
+            .library_div{
+                background-color: white;
+                width: 700px;
+                height: 500px;
+                border-radius: 5px;
+                position: absolute;
+                right: 200px;
+                bottom: -600px;
+                border: 1px solid #303030;
+                display:none;
+                padding: 10px;
+                padding-left: 0;
+                overflow: scroll;
+                padding-top: 0;
+                background-color: #cccccc;
+            }
+            .visible{
+
+                display: block;
+            }
+            #close_library{
+                position: fixed;
+                display: block;
+                background-color: #303030;
+                padding: 10px;
+                width: 670px;
+                margin: 0 auto;
+                color: white;
+
+            }
+            #close_library:visited{
+                color: white;
+            }
+            #list_cover{
+                height: 50px;
+                width: 50px;
+                margin: 0 auto;
+
+            }
+            .library_list_item{
+                padding: 10px;
+                height: 50px;
+                margin-top: 5px;
+
+            }
+            .library_list_item:hover{
+                background-color: purple;
+                color: white;
+            }
+            .library_chooser_list{
+                list-style: none;
+            }
+            #mainHead{
+
+                background-color: #303030;
+                color: White;
+                margin-left: 0;
+                margin-right: 0;
+                margin-top: 0;
+                height: 45px;
+                margin-bottom: 10px;
+                padding: 10px;
+
+
+
+            }
+
+            #headerTitle{
+
+                display: inline
+                width: 400px;
+                float: left;
+                margin-right: 20px;
+                font-family: 'Sigmar One', cursive;
+                font-size: 24px;
+                padding-bottom: 10px;
+                color: white;
+
+            }
+
+            #headerTitle:hover{
+
+                color: pink;
+
+            }
+        </style>
+    </head>
+    <body>
+        <div id="mainHead"><a href="/"><div id="headerTitle">Lexi's Family and Friends Library</div></a>
+        </div>
+        <div class='big_wrapper'>
+
+            <div class="calendar" id="{{month}}">
+                <div class="month_bar">
+                    {% if month in "May" %}
+                        <div class='month_button selected' id='may_date' onclick='selectButton("#may_date", "May")' >May</div>
+                    {% else %}
+                        <div class='month_button' id='may_date' onclick='selectButton("#may_date", "May")' >May</div>
+                    {% endif %}
+                    {% if month in "June" %}
+                        <div class='month_button selected' id='june_date' onclick='selectButton("#june_date", "June")' >June</div>
+                    {% else %}
+                        <div class='month_button' id='june_date' onclick='selectButton("#june_date", "June")' >June</div>
+                    {% endif %}
+                    {% if month in "July" %}
+                        <div class='month_button selected' id='july_date' onclick='selectButton("#july_date","July")' >July</div>
+                    {% else %}
+                        <div class='month_button' id='july_date' onclick='selectButton("#july_date", "July")' >July</div>
+                    {% endif %}
+                    {% if month in "August" %}
+                        <div class='month_button selected' id='august_date' onclick='selectButton("#august_date", "August")' >August</div>
+                    {% else %}
+                        <div class='month_button' id='august_date' onclick='selectButton("#august_date","August")' >August</div>
+                    {% endif %}
+                    <h3 class='summer_title'>Summer Vacation Reading Calendar</h3>
+                </div>
+                <div class='day_labels'>
+                    <div class='day_of_week'>Sun</div>
+                    <div class='day_of_week'>Mon</div>
+                    <div class='day_of_week'>Tue</div>
+                    <div class='day_of_week'>Wed</div>
+                    <div class='day_of_week'>Thu</div>
+                    <div class='day_of_week'>Fri</div>
+                    <div class='day_of_week'>Sat</div>
+                </div>
+                {% for day in day_count.0 %}
+
+                    <div class='calendar_blank' ></div>
+
+                {% endfor %}
+                {% for day in day_count.1 %}
+                    <div class='calendar_date' id='day_{{month}}_{{day}}' onclick='viewDetail("/SummerVacation/lexi/{{month}}/{{day}}")' >
+
+                        <div id='{{day}}_{{month}}_day'>{{day}}</div>
+
+                        <div class="book_count_display" id='{{day}}' >
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            <div class='day_tracker' >
+                <div class='day_header' id="month_tracker">
+                    <div id="month_name">{{month}}</div>
+                    <div class='day_number' id='month_day_tracker' >{{day}}</div>
+                </div>
+                <div class='day_body' id="month_body">
+                    <a class='choose_from_library' href="#" onclick="chooseFromLibrary()">choose from library</a>
+                    <form action='/SummerVacation/addBook/lexi/{{month}}/{{day}}' method='POST' autocomplete='off'>
+                    <input type='text' name='book_title' id='input_book_textarea' class='input_book' placeholder='Enter a Book' />
+                    <br>
+                    <textarea rows="4" cols="50" name='comment' class='input_book_text' placeholder='What was this book about?' /></textarea>
+                    <br>
+                    <input type='submit'class='send_book_button'/>
+                    </form>
+                </div>
+                <div class='book_area' >
+                    {% for i in todays_books %}
+
+                       <div class="books_area" >
+                           <div class='book_title_area' id="{{i.0}}">{{i.1}}</div>
+                            <div class='delete_book'>
+                                <form method='POST' action='/SummerVacation/removeBook/lexi/{{month}}/{{day}}/{{i.0}}'>
+                                    <input type='submit' value='delete' class='delete_book_button'/>
+                                </form>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class='day_tracker' id='performance' >
+                <div class='day_header' id="Performance_tracker">
+                    <div id="goals_header">Progress</div>
+                </div>
+                <div class='book_area' >
+                    <div class='total_books' >Summer Book Reading Goal: 100</div>
+                    <div class='total_books' >Total Books Read This Summer: {{total_books_read.0}}</div>
+                    <div class='progess_bar' id='progress_bar_div'>
+                         <div class='progress_bar_status' id='progress_bar_status_div'>
+                        0%
+                        </div>
+                    </div>
+                </div>
+                <hr>
+                <div class='day_header'>Book Details</div>
+                <h4 class='total_books center'>Book Title:</h4>
+                <div class='book_title_textarea' id='title_textarea'></div>
+                <h4 class='total_books center'>What Was this Story About?</h4>
+                <div class='book_comment_textarea' id='book_comment_area' >
+                </div>
+            </div>
+        </div>
+        <div class='library_div'>
+            <a href='#' onclick="closeLibraryChooser()" id="close_library">close</a>
+            <ul class='library_chooser_list'>
+            {% for i in library_books %}
+                <li onclick="chooseItem('{{i.0}}')" class='library_list_item' id="{{i.0}}"><img id='list_cover' src='{{i.1}}' /> {{i.0}}</li>
+            {% endfor %}
+            </ul>
+        </div>
+    </body>
+</html>
