@@ -12,263 +12,22 @@ from wtforms.validators import Required
 from flask.ext.sqlalchemy import SQLAlchemy
 from flask.ext.script import Shell
 
-class NameForm(Form):
-    name = StringField('What\'s your Name?', validators=[Required()])
-    submit = SubmitField('Submit')
-
 
 app = Flask(__name__)
 bootstrap = Bootstrap(app)
-basedir = os.path.abspath(os.path.dirname(__file__))
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'data.sqlite')
-app.config['SQLALCHEMY_COMMIT_ON_TEARDOWN'] = True
+
 app.config['SECRET_KEY'] = os.environ['KEY']
-
-db = SQLAlchemy(app)
-
-class Role(db.Model):
-    __tablename__ = 'roles'
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(64), unique=True)
-    users = db.relationship('User', backref='role')
-
-    def __repr__(self):
-        return '<Role %r>' % self.name
-
-class User(db.Model):
-    __tablenames__ = 'users'
-    id = db.Column(db.Integer, primary_key = True)
-    username = db.Column(db.String(64), unique = True)
-    role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
-
-    def __repr__(self):
-        return '<User %r>' % self.username
-
-
-class Book(db.Model):
-    __tablename__ = 'books'
-    id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.Integer, unique=False)
-
-
-
-@app.route('/helloworld')
-def helloworld():
-    return "Hello, World"
-
-
-@app.route('/helloworld/<name>')
-def helloname(name):
-    return "Hello, %s" % (name)
-
-
-@app.route('/user/', methods=['GET', 'POST'])
-def user():
-    form = NameForm()
-    if form.validate_on_submit():
-        user = User.query.filter_by(username=form.name.data).first()
-        if user is None:
-            user = User(username= form.name.data)
-            db.session.add(user)
-            session['known'] = False
-        else:
-            session['known'] = True
-        session['name'] = form.name.data
-        form.name.data = ''
-        return redirect(url_for('user'))
-    return render_template('user.html',
-            name=session.get('name'),
-            form=form,
-            current_time=datetime.utcnow(),
-            known=session.get('known', False))
 
 
 @app.errorhandler(404)
 def page_not_found(e):
-    return render_template('404.html'), 404
+    return '404 page not found', 400
 
 
 @app.errorhandler(500)
 def internal_server_error(e):
-    return render_template('500.html'), 500
-
-
-
-
-
-
-# configuartion
-DATABASE = 'flaskr.db'
-DEBUG = True
-SECRET_KEY = 'development key'
-USERNAME = 'admin'
-PASSWORD = 'default'
-APP_NAME = 'flaskr'
-
-app.config.from_object(__name__)
-
-def connect_db():
-    return sqlite3.connect(app.config['DATABASE'])
-
-@app.before_request
-def before_request():
-    g.db = connect_db()
-
-
-@app.route('/flaskr')
-def flaskr():
-    conn = g.db.get_cursor()
-    conn.execute('''select * from entries''')
-    result = conn.fetchall()
-    return render_template('flaskr.html',title=result[0][1])
-
-
-
-@app.route('/routine')
-def routine():
-    tasks = [
-        ('Fix your broken windows',2),
-        ('Weigh yourself every day', 1),
-        ('Practice Rebounding', 3),
-        ('16oz Glass of Cold Water with Lemon', 2),
-        ('Take a Daily Vitamins', 2),
-        ('Maintain a Food Journal', 5),
-        ('Review Your Goals', 5),
-        ('Use the Lift App', 5),
-        ('Let the Natual Light in', 1),
-        ('Make an Antioxidant Smoothie', 3),
-        ('Eat Other Nutritious Foods', 5),
-        ('Meditate for 5 Minutes', 5),
-        ('Yoga for 10 minutes', 10),
-        ('Have a Mint', 2),
-        ('Have a Jam Session', 4),
-        ('Text Something Encouraging', 2),
-        ('Leave a note for your loved one',2),
-        ('Recite Affirmations', 3),
-        ('Read your favorite blog or a chapter in your newest book', 5),
-        ('Read an Inspirational Passage', 5),
-        ('Sign into an Online Forum or Facebook Group', 5),
-        ('Create a Most Important Tasks (MITs) List', 5),
-        ('Plan your run', 5),
-        ('Keep it regular', 5),
-        ('Reward Yourself Immediately', 5),
-        ('Build your own support system', 5)]
-
-    return render_template('routine.html', tasks=tasks)
-
-
-@app.route('/frogs')
-def frog_home():
-    return render_template('home.html')
-
-
-@app.route('/frogs/books')
-def frog_books():
-    return render_template('books.html')
-
-
-@app.route('/frogs/membership_card')
-def frog_membership_card():
-    return render_template('membership_card.html')
-
-
-@app.route('/frogs/snacks')
-def frog_snacks():
-    return render_template('snacks.html')
-
-
-@app.route('/frogs/quiz_main')
-def frog_quiz_main():
-    return render_template('quiz-main.html')
-
-
-@app.route('/frogs/quiz_1')
-def frog_quiz_1():
-    return render_template('quiz-1.html')
-
-
-@app.route('/frogs/quiz_2')
-def frog_quiz_2():
-    return render_template('quiz-2.html')
-
-
-@app.route('/frogs/quiz_3')
-def frog_quiz_3():
-    return render_template('quiz-3.html')
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    return  '500 server error', 500
 
 
 class Library:
@@ -353,10 +112,7 @@ class Library:
         dbc.close()
 
 
-
 ALLOWED_EXTENSIONS = ['jpg','jpe','png',]
-
-app.debug = True
 
 
 def allowed_file(filename):
@@ -388,7 +144,6 @@ def GetImageLink(ISBN):
     return response.text
 
 
-
 @app.route('/addCoverPicutre', methods=['POST'])
 def add_cover_picture():
     image_url = request.form['url']
@@ -399,10 +154,6 @@ def add_cover_picture():
     dbc.commit()
     c.close()
     return redirect(url_for('home'))
-
-
-
-
 
 
 @app.route('/library')
@@ -430,9 +181,11 @@ def home(name='Lexi'):
                                          count_books_no_pic=count_books_no_pic,
                                          total_books = total_books)
 
+
 @app.route('/')
 def go_to_open():
     return redirect(url_for('home'))
+
 
 @app.route('/SummerVacation', methods=['GET','POST'])
 @app.route('/SummerVacation/<user>/<month>/<day>', methods=['GET','POST'])
@@ -464,7 +217,6 @@ def summer_vacation(user="lexi", month="May", day="1"):
                             total_books_read=total_books_read,
                             book_counts=book_counts,
                             library_books=library_books)
-
 
 
 @app.route('/SummerVacation/addBook/<user>/<month>/<day>', methods=['POST'])
@@ -605,6 +357,7 @@ def homeAbby():
                                          count_books_no_pic=count_books_no_pic,
                                          total_books = total_books)
 
+
 @app.route('/GetPasswordAbby', methods=['POST'])
 def getPasswordAbby():
     current_book_id = request.form['deleteID']
@@ -666,6 +419,7 @@ def checkOutBookAbby():
     dbc.close()
     return redirect('/Abby', code=302)
 
+
 @app.route('/CheckInAbby', methods=['POST'])
 def checkInBookAbby():
     current_book_id = request.form['checkIn']
@@ -689,32 +443,5 @@ def removebookAbby():
         dbc.commit()
         dbc.close()
     return redirect("/Abby", code=302)
-
-
-
-##########################################################################
-
-@app.route('/OldHome')
-def OldHome():
-    KEY = os.environ['KEY']
-    db = sqlite3.connect('testdb.db')
-    c = db.cursor()
-    c.execute(''' insert into user (name) values ('david')''')
-    db.commit()
-    c.execute('''select * from user''')
-
-    data = c.fetchall()
-
-    db.close()
-
-    return render_template('new_home.html', key=KEY, data=data)
-
-@app.route('/lexi')
-def Lexi():
-    return render_template('lexi.com.html',User='David')
-
-@app.route('/AllAboutMe')
-def aam():
-    return render_template('AllAboutMe.html',words1='This is a story about Lexi', words2='she loves to play all day')
 
 
